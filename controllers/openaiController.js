@@ -6,9 +6,33 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 const generateImage = async (req, res) => {
-    res.status(200).json({
-        success: true,
-    });
+    try {
+        const response = await openai.createImage({
+            prompt: 'Polar bear on ice',
+            n: 1,
+            size: '512x512',
+        });
+
+        const imageURL = response.data.data[0].url;
+
+        res.status(200).json({ 
+            success: true, 
+            data: imageURL
+        });
+    } catch (error) {
+
+        if (error.response) {
+            console.log(error.response.status);
+            console.log(error.response.data);
+        } else {
+            console.log(error.message);
+        }
+
+        res.status(400).json({ 
+            success: false, 
+            error: 'The image cannot be generated.'
+        });
+    }
 };
 
 module.exports = {generateImage};
